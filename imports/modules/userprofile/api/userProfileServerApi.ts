@@ -20,11 +20,12 @@ interface IUserProfileEstendido extends IUserProfile {
  * Return Logged User if exists.
  * @return {Object} Logged User
  */
-export const getUserServer = async (connection?: { id: string } | null): IUserProfile => {
-	const user: (User & IMeteorUser) | null = await Meteor.userAsync();
+export const getUserServer = async (connection?: { id: string } | null): Promise<IUserProfile> => {
+	const user = await Meteor.userAsync();
 
 	try {
 		const userProfile = await userprofileServerApi.getCollectionInstance().findOneAsync({
+			// @ts-ignore
 			email: user.profile.email
 		});
 
@@ -46,7 +47,8 @@ export const getUserServer = async (connection?: { id: string } | null): IUserPr
 		const simpleDate = `${d.getFullYear()}${d.getMonth() + 1}${d.getDay()}`;
 		const id = connection && connection.id ? simpleDate + connection.id : nanoid();
 		return {
-			id,
+			username: '',
+			email: '',
 			_id: id,
 			roles: [EnumUserRoles.PUBLICO]
 		};

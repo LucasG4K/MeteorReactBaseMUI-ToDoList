@@ -14,16 +14,10 @@ interface ISignInStyles {
 const SignInStyles: ISignInStyles = {
 	Container: styled(Box)(({ theme }) => ({
 		minHeight: '100vh',
-		width: '100%',
+		width: '100vw',
 		backgroundColor: theme.palette.primary.main,
 		color: theme.palette.primary.contrastText,
 		position: 'relative',
-
-		[theme.breakpoints.up('md')]: {
-			backgroundImage: 'url(/images/wireframe/background-synergia.svg)',
-			backgroundSize: 'cover',
-			backgroundPosition: 'right'
-		}
 	})),
 	Content: styled(Box)(({ theme }) => ({
 		width: '100%',
@@ -34,15 +28,6 @@ const SignInStyles: ISignInStyles = {
 		alignItems: 'center',
 		gap: theme.spacing(6),
 		padding: `${sysSizing.spacingFixedLg} ${sysSizing.spacingFixedXl}`,
-
-		[theme.breakpoints.up('md')]: {
-			width: 'auto',
-			height: 'auto',
-			position: 'absolute',
-			top: '50%',
-			left: '10%',
-			transform: 'translateY(-50%)'
-		}
 	})),
 	FormContainer: styled(Paper)(({ theme }) => ({
 		width: '100%',
