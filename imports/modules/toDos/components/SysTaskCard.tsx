@@ -1,15 +1,20 @@
 import React, { useState } from 'react';
 import { IToDo } from "../api/toDoSch"
 import { Checkbox, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Menu, MenuItem, Tooltip, Typography } from '@mui/material';
-import { DeleteOutlineOutlined, EditOutlined, MoreVertOutlined } from '@mui/icons-material';
-
+import { DeleteOutlineOutlined, EditOutlined, MoreVertOutlined, RadioButtonUncheckedOutlined, TaskAltOutlined } from '@mui/icons-material';
+import ToDoListController, { ToDoListControllerContext } from '../pages/toDoList/toDoListController';
+import DeleteDialog from '/imports/ui/appComponents/showDialog/custom/deleteDialog/deleteDialog';
+import AppLayoutContext from '/imports/app/appLayoutProvider/appLayoutContext';
 
 interface ISysTaskCard {
     task: IToDo;
-
 }
 
 const SysTaskCard = ({ task }: ISysTaskCard) => {
+
+    const sysLayoutContext = React.useContext(AppLayoutContext)
+    const controller = React.useContext(ToDoListControllerContext);
+    const { onEditButtonClick, onDeleteButtonClick, onCheckButtonClick } = controller;
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -22,11 +27,9 @@ const SysTaskCard = ({ task }: ISysTaskCard) => {
         setAnchorEl(null);
     };
 
-
     return (
         <>
             <ListItem
-                key={task._id}
                 disablePadding
                 secondaryAction={
                     <>
@@ -36,10 +39,27 @@ const SysTaskCard = ({ task }: ISysTaskCard) => {
                             </IconButton>
                         </Tooltip>
                         <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose}>
-                            <MenuItem onClick={handleMenuClose}>
+                            <MenuItem onClick={() => {
+                                handleMenuClose;
+                                onEditButtonClick(task._id);
+                            }}>
                                 <EditOutlined /> Editar
                             </MenuItem>
-                            <MenuItem onClick={handleMenuClose}>
+                            <MenuItem onClick={() => {
+                                handleMenuClose;
+                                DeleteDialog({
+                                    showDialog: sysLayoutContext.showDialog,
+                                    closeDialog: sysLayoutContext.closeDialog,
+                                    title: `Excluir tarefa ${task.title}`,
+                                    message: `Tem certeza que deseja excluir a tarefa ${task.title}?`,
+                                    onDeleteConfirm: () => {
+                                        onDeleteButtonClick(task);
+                                        sysLayoutContext.showNotification({
+                                            message: 'Excluído com sucesso!'
+                                        });
+                                    }
+                                });
+                            }}>
                                 <DeleteOutlineOutlined /> Deletar
                             </MenuItem>
                         </Menu>
@@ -51,29 +71,32 @@ const SysTaskCard = ({ task }: ISysTaskCard) => {
                         <Checkbox
                             edge='start'
                             checked={task.done}
-                            tabIndex={-1}
-                            disableRipple
+                            icon={<RadioButtonUncheckedOutlined />}
+                            checkedIcon={<TaskAltOutlined />}
+                            onClick={() => console.log(task)}
+                            onChange={(event) => onCheckButtonClick({ ...task, done: event.target.checked })}
                         />
                     </ListItemIcon>
                     <ListItemText
                         id={task._id}
-                        primary={task.title}
+                        primary={task.done ? <s>{task.title}</s> : task.title}
                         secondary={
                             <>
+                                {`Criada por: `}
                                 <Typography
                                     variant='body2'
                                     component='span'
-                                    sx={{ display: 'inline' }}
+                                    sx={{ display: 'inline', textDecorationLine: 'underline' }}
                                 >
-                                    {`Criada por: ${task.owner}`}
+                                    {task.owner}
                                 </Typography>
-                                {` - ${task.description}`}
+                                {task.description ? ` - ${task.description}` : ''}
                             </>
                         }
                     />
                 </ListItemButton>
-                <Divider />
             </ListItem>
+            <Divider />
         </>
     )
 }

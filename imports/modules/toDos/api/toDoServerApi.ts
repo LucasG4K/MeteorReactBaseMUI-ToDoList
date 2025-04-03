@@ -19,12 +19,16 @@ class ToDoServerApi extends ProductServerBase<IToDo> {
 			'toDoList',
 			(filter = {}) => {
 				return this.defaultListCollectionPublication(filter, {
-					projection: { title: 1, description: 1, done: 1, picture: 1, createdby: 1 }
+					projection: { title: 1, description: 1, done: 1, picture: 1, shared: 1, createdby: 1 }
 				});
 			},
 			async (doc: IToDo & { owner: string }) => {
+				const user = await Meteor.userAsync();
 				const userProfileDoc = await userprofileServerApi.getCollectionInstance().findOneAsync({ _id: doc.createdby });
-				return { ...doc, owner: userProfileDoc?.username ?? 'Usuário Desconhecido' };
+				return {
+					...doc,
+					owner: user?._id === userProfileDoc._id ? 'Você' : (userProfileDoc?.username ?? 'Usuário Desconhecido')
+				};
 			}
 		);
 

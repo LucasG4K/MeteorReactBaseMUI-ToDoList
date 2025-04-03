@@ -10,7 +10,7 @@ export const toDoSch: ISchema<IToDo> = {
 	description: {
 		type: String,
 		label: 'Descrição',
-		optional: false
+		optional: true
 	},
 	shared: {
 		type: String,

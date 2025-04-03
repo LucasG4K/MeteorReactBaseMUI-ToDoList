@@ -3,11 +3,16 @@ import { styled } from '@mui/material/styles';
 import Box, { BoxProps } from '@mui/material/Box';
 import { sysSizing } from '../../../../ui/materialui/styles';
 import { SysSectionPaddingXY } from '../../../../ui/layoutComponents/sysLayoutComponents';
+import Grid, { GridProps } from '@mui/material/Grid';
+import sysLightPalette from '/imports/ui/materialui/sysColors';
+
 
 interface IToDoListStyles {
 	Container: ElementType<BoxProps>;
 	LoadingContainer: ElementType<BoxProps>;
 	SearchContainer: ElementType<BoxProps>;
+	TaskStatus: ElementType<GridProps>;
+	TabView: ElementType<BoxProps>;
 }
 
 const ToDoListStyles: IToDoListStyles = {
@@ -42,6 +47,13 @@ const ToDoListStyles: IToDoListStyles = {
 		[theme.breakpoints.down('sm')]: {
 			flexDirection: 'column'
 		}
+	})),
+	TaskStatus: styled(Grid)(({theme}) => ({
+		marginTop: sysSizing.spacingFixedMd
+	})),
+	TabView: styled(Box)(({ theme }) => ({
+		width: '100%',
+		marginBottom: sysSizing.spacingFixedMd
 	}))
 };
 
