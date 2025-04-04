@@ -6,6 +6,8 @@ import ToDoListController, { ToDoListControllerContext } from '../pages/toDoList
 import DeleteDialog from '/imports/ui/appComponents/showDialog/custom/deleteDialog/deleteDialog';
 import AppLayoutContext from '/imports/app/appLayoutProvider/appLayoutContext';
 
+// diff para testar git
+
 interface ISysTaskCard {
     task: IToDo;
 }
