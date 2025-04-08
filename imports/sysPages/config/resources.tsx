@@ -5,11 +5,4 @@ enum HomeResources {
 	HOME_REMOVE = 'HOME_REMOVE'
 }
 
-enum SysFormTestPageResources {
-	SYSFORMTESTS_VIEW = 'SYSFORMTESTS_VIEW',
-	SYSFORMTESTS_CREATE = 'SYSFORMTESTS_CREATE',
-	SYSFORMTESTS_UPDATE = 'SYSFORMTESTS_UPDATE',
-	SYSFORMTESTS_REMOVE = 'SYSFORMTESTS_REMOVE'
-}
-
-export { HomeResources, SysFormTestPageResources };
+export { HomeResources };

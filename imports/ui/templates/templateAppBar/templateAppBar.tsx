@@ -34,7 +34,7 @@ const BoilerplateLogo: React.FC = () => {
 			color={(theme) => theme.palette.sysText?.tertiary}
 			sx={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
 			{'{ '}
-			<Typography color={(theme) => theme.palette.primary.contrastText} variant="inherit">
+			<Typography color={(theme) => theme.palette.primary.contrastText} variant="h5">
 				ToDo List
 			</Typography>{' '}
 			{'}'}

@@ -4,23 +4,37 @@ import { styled } from '@mui/material/styles';
 import { sysSizing } from '../../../../ui/materialui/styles';
 
 interface IToDoDetailStyles {
-	Container: ElementType<BoxProps>;
+	Frame: ElementType<BoxProps>;
+	LoadingContainer: ElementType<BoxProps>;
 	FieldsForm: ElementType<BoxProps>;
 	Actions: ElementType<BoxProps>;
 }
 
 const ToDoDetailStyles: IToDoDetailStyles = {
-	Container: styled(Box)(() => ({
+	Frame: styled(Box)(() => ({
+		// height: '600px',
+		width: '540px',
 		display: 'flex',
 		flexDirection: 'column',
 		gap: sysSizing.spacingFixedLg,
-		width: '540px',
-		padding: sysSizing.spacingFixedLg
+		padding: sysSizing.spacingFixedLg,
+		justifyContent: 'space-evenly',
+	})),
+	LoadingContainer: styled(Box)(({ theme }) => ({
+		width: '100%',
+		display: 'flex',
+		flexGrow: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'column',
+		gap: theme.spacing(2)
 	})),
 	FieldsForm: styled(Box)(() => ({
+		height: '100%',
 		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'space-evenly',
 		gap: sysSizing.spacingFixedMd,
-		flexDirection: 'column'
 	})),
 	Actions: styled(Box)(() => ({
 		display: 'flex',

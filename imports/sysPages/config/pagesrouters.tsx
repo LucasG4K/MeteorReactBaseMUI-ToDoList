@@ -6,7 +6,7 @@ import { PasswordRecovery } from '../../sysPages/pages/recoveryPassword/password
 import { IRoute } from '../../modules/modulesTypings';
 import { NoPermission } from '../../sysPages/pages/noPermission/noPermission';
 import SignInPage from '../pages/signIn/signIn';
-import { HomeResources, SysFormTestPageResources } from './resources';
+import { HomeResources } from './resources';
 import SysFormPlayground from '../../sysPages/pages/sysFormPlayground/sysFormPlayground';
 
 export const pagesRouterList: (IRoute | null)[] = [
@@ -16,12 +16,6 @@ export const pagesRouterList: (IRoute | null)[] = [
 		component: Home,
 		isProtected: true,
 		resources: [HomeResources.HOME_VIEW]
-	},
-	{
-		path: '/sysFormTests',
-		component: SysFormPlayground,
-		isProtected: true,
-		resources: [SysFormTestPageResources.SYSFORMTESTS_VIEW]
 	},
 	{
 		path: '/signin',

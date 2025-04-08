@@ -1,4 +1,4 @@
-export enum Recurso {
+export enum ToDoResources {
 	TODO_VIEW = 'TODO_VIEW',
 	TODO_CREATE = 'TODO_CREATE',
 	TODO_UPDATE = 'TODO_UPDATE',

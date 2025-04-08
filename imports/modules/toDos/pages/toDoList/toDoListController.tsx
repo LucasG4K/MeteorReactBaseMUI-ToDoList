@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useMemo } from 'react';
+import React, { useState, useCallback, useContext, useMemo } from 'react';
 import ToDoListView from './toDoListView';
 import { nanoid } from 'nanoid';
 import { useTracker } from 'meteor/react-meteor-data';
@@ -19,8 +19,9 @@ interface IInitialConfig {
 
 interface IToDoListContollerContext {
 	onAddButtonClick: () => void;
-	onCheckButtonClick: (row: any) => void;
 	onEditButtonClick: (row: any) => void;
+	onTaskDetailClick: (row: any) => void;
+	onCheckButtonClick: (row: any) => void;
 	onDeleteButtonClick: (row: any) => void;
 	todoListNotDone: IToDo[];
 	todoListDone: IToDo[];
@@ -36,38 +37,34 @@ export const ToDoListControllerContext = React.createContext<IToDoListContollerC
 
 
 const initialConfig = {
-	sortProperties: { field: 'lastupdate', sortAscending: true },
+	sortProperties: { field: 'createdat', sortAscending: true },
 	filter: { shared: 'Minhas Tarefas' },
 	searchBy: null,
 	viewComplexTable: false
 };
 
 const ToDoListController = () => {
-	const [config, setConfig] = React.useState<IInitialConfig>(initialConfig);
-	const { showNotification, showDialog } = useContext<IAppLayoutContext>(AppLayoutContext);
+	const [config, setConfig] = useState<IInitialConfig>(initialConfig);
+	const [toggleShowDrawer, setToggleShowDrawer] = useState<boolean>(false);
+	const { showDialog, showDrawer } = useContext<IAppLayoutContext>(AppLayoutContext);
 	const { user } = useContext<IAuthContext>(AuthContext);
-
-	console.log(user);
 
 	const { title, date, done, shared, picture } = toDoApi.getSchema();
 	const toDoSchReduzido = { title, date, done, shared, picture, createdat: { type: Date, label: 'Criado em' }, cretedby: { type: String, label: 'Criado por' } };
 
-	const { sortProperties, filter } = config;
+	const { filter } = config;
+
 	const sharedFilter = {
 		...filter,
 		$or: [{ shared: 'Tarefas do Time' }, { createdby: user?._id }]
 	}
-	const sort = {
-		[sortProperties.field]: sortProperties.sortAscending ? 1 : -1
-	};
 
 	const { loading, toDosNotDone, toDosDone } = useTracker(() => {
-		const subHandle = toDoApi.subscribe('toDoList', sharedFilter, {
-			sort
-		});
 
-		const toDosNotDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: { $ne: true } }, { sort }).fetch() : [];
-		const toDosDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: true }, { sort }).fetch() : [];
+		const subHandle = toDoApi.subscribe('toDoList', sharedFilter);
+
+		const toDosNotDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: { $ne: true } }, { createdat: 1 }).fetch() : [];
+		const toDosDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: true }, { createdat: 1 }).fetch() : [];
 
 		return {
 			toDosNotDone,
@@ -93,6 +90,18 @@ const ToDoListController = () => {
 		},
 		[toDosNotDone, toDosDone]
 	);
+
+	const onTaskDetailClick = useCallback(
+		(id: string) => {
+			showDrawer({
+				variant: 'persistent',
+				anchor: 'right',
+				open: toggleShowDrawer,
+				close: () => setToggleShowDrawer(false),
+				children: <ToDoDetailController id={id} mode="view" />
+			})
+		}, []
+	)
 
 	const onCheckButtonClick = useCallback((row: any) => {
 		toDoApi.update(row);
@@ -130,8 +139,9 @@ const ToDoListController = () => {
 	const providerValues: IToDoListContollerContext = useMemo(
 		() => ({
 			onAddButtonClick,
-			onCheckButtonClick,
 			onEditButtonClick,
+			onTaskDetailClick,
+			onCheckButtonClick,
 			onDeleteButtonClick,
 			todoListNotDone: toDosNotDone,
 			todoListDone: toDosDone,

@@ -26,5 +26,6 @@ export default (props: IDefaultContainerProps) => {
 		state,
 		id
 	};
+
 	return <ToDoModuleContext.Provider value={providerValue}>{renderPage()}</ToDoModuleContext.Provider>;
 };

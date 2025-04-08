@@ -4,7 +4,6 @@ import Box, { BoxProps } from '@mui/material/Box';
 import { sysSizing } from '../../../../ui/materialui/styles';
 import { SysSectionPaddingXY } from '../../../../ui/layoutComponents/sysLayoutComponents';
 import Grid, { GridProps } from '@mui/material/Grid';
-import sysLightPalette from '/imports/ui/materialui/sysColors';
 
 
 interface IToDoListStyles {

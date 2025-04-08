@@ -6,18 +6,22 @@ import { IToDo } from '../../api/toDoSch';
 import { ISchema } from '../../../../typings/ISchema';
 import { IMeteorError } from '../../../../typings/BoilerplateDefaultTypings';
 import AppLayoutContext, { IAppLayoutContext } from '/imports/app/appLayoutProvider/appLayoutContext';
+import { sysSizing } from '/imports/ui/materialui/styles';
 
 interface IToDoDetailContollerContext {
 	document: IToDo;
 	loading: boolean;
 	schema: ISchema<IToDo>;
 	onSubmit: (doc: IToDo) => void;
-	mode: 'create' | 'edit';
+	onEditButtonClick: (doc: IToDo) => void;
+	onCheckButtonClick: (doc: IToDo) => void;
+	mode: 'create' | 'edit' | 'view';
 	closeDialog: () => void;
+	closeDrawer: () => void;
 }
 
 interface IDetailController {
-	mode: 'create' | 'edit';
+	mode: 'create' | 'edit' | 'view';
 	id?: string;
 }
 
@@ -26,7 +30,7 @@ export const ToDoDetailControllerContext = createContext<IToDoDetailContollerCon
 );
 
 const ToDoDetailController = ({ id, mode }: IDetailController) => {
-	const { showNotification, closeDialog } = useContext<IAppLayoutContext>(AppLayoutContext);
+	const { showNotification, showDialog, closeDialog, closeDrawer } = useContext<IAppLayoutContext>(AppLayoutContext);
 
 	const { document, loading } = useTracker(() => {
 		const subHandle = toDoApi.subscribe('toDoDetail', { _id: id });
@@ -37,8 +41,19 @@ const ToDoDetailController = ({ id, mode }: IDetailController) => {
 		};
 	}, [id]);
 
+	const onEditButtonClick = useCallback((doc: IToDo) => {
+		showDialog({
+			sx: { borderRadius: sysSizing.radiusMd },
+			children: <ToDoDetailController id={doc._id} mode="edit" />
+		});
+	}, []
+	);
+
+	const onCheckButtonClick = useCallback((doc: IToDo) => {
+		toDoApi.update(doc);
+	}, [document]);
+
 	const onSubmit = useCallback((doc: IToDo) => {
-		console.log(doc);
 		toDoApi['upsert'](doc, (e: IMeteorError) => {
 			if (!e) {
 				showNotification({
@@ -65,7 +80,10 @@ const ToDoDetailController = ({ id, mode }: IDetailController) => {
 				schema: toDoApi.getSchema(),
 				mode,
 				onSubmit,
+				onEditButtonClick,
+				onCheckButtonClick,
 				closeDialog,
+				closeDrawer,
 			}}>
 			{<ToDoDetailView />}
 		</ToDoDetailControllerContext.Provider>

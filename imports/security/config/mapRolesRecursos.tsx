@@ -1,8 +1,7 @@
-import { Recurso as Exemplo } from '/imports/modules/example/config/recursos';
-import { Recurso as Usuarios } from '/imports/modules/userprofile/config/recurso';
-import { Recurso as ToDo } from '/imports/modules/toDos/config/recursos';
+import { UserProfileResources} from '/imports/modules/userprofile/config/recurso';
+import { ToDoResources } from '/imports/modules/toDos/config/recursos';
 import { RoleType } from '/imports/security/config/roleType';
-import { HomeResources, SysFormTestPageResources } from '/imports/sysPages/config/resources';
+import { HomeResources } from '/imports/sysPages/config/resources';
 
 const _getAllValues = (obj: any) => Object.keys(obj).map(key => obj[key]);
 
@@ -11,16 +10,14 @@ type MapRolesRecursos = Record<RoleType, Array<string>>;
 const _mapRolesRecursos: MapRolesRecursos = {
 	[RoleType.PUBLICO]: [],
 	[RoleType.USUARIO]: [
-		..._getAllValues(SysFormTestPageResources),
 		..._getAllValues(HomeResources),
-		..._getAllValues(Exemplo),
-		..._getAllValues(ToDo),
-		Usuarios.USUARIO_UPDATE,
-		Usuarios.USUARIO_VIEW,	
+		..._getAllValues(ToDoResources),
+		UserProfileResources.USERPROFILE_UPDATE,
+		UserProfileResources.USERPROFILE_VIEW,	
 	],
 	[RoleType.ADMINISTRADOR]: [
-		Usuarios.USUARIO_CREATE,
-		Usuarios.USUARIO_REMOVE,
+		UserProfileResources.USERPROFILE_CREATE,
+		UserProfileResources.USERPROFILE_REMOVE,
 	],
 };
 

@@ -11,9 +11,10 @@ import { SysFab } from '../../../../ui/components/sysFab/sysFab';
 import AppLayoutContext, { IAppLayoutContext } from '/imports/app/appLayoutProvider/appLayoutContext';
 import List from '@mui/material/List';
 import IconButton from '@mui/material/IconButton';
-import { ChevronRightOutlined, ExpandMoreOutlined } from '@mui/icons-material';
 import { SysTaskCard } from '../../components/SysTaskCard';
 import { SysTabs } from '/imports/ui/components/sysTabs/sysTabs';
+import { ShowDrawer } from '/imports/ui/appComponents/showDrawer/showDrawer';
+import { SysTaskDrawerDetail } from '../../components/SysTaskDrawerDetail';
 
 const ToDoListView = () => {
 
@@ -29,14 +30,15 @@ const ToDoListView = () => {
 	]
 
 	const sysLayoutContext = useContext<IAppLayoutContext>(AppLayoutContext);
-	const controller = React.useContext(ToDoListControllerContext);
-	const { todoListNotDone, todoListDone, loading, onChangeTextField, onAddButtonClick, onChangeCategory } = controller;
+	const controller = useContext(ToDoListControllerContext);
+	const { todoListNotDone, todoListDone, loading, onChangeTextField, onAddButtonClick, onChangeCategory, onTaskDetailClick } = controller;
 	const { Container, LoadingContainer, SearchContainer, TaskStatus, TabView } = ToDoListStyles;
 
-
 	const [tab, setTab] = useState(tabs[0].value);
-	const [showListDone, setShowListDone] = useState<boolean>(true);
-	const [showListNotDone, setShowListNotDone] = useState<boolean>(true);
+	const [showListDone, setShowListDone] = useState<boolean[]>([true, true]);       // [minhas tarefas DONE, tarefas do time DONE]
+	const [showListNotDone, setShowListNotDone] = useState<boolean[]>([true, true]); // [minhas tarefas NOT DONE, tarefas do time NOT DONE]
+
+	const tabIndex = tabs.indexOf(tabs.find((item) => item.value === tab)!);
 
 	return (
 		<Container>
@@ -72,34 +74,48 @@ const ToDoListView = () => {
 				<Box sx={{ width: '100%' }}>
 
 					<TaskStatus container={true}>
-						<IconButton onClick={() => setShowListNotDone(!showListNotDone)}>
-							{showListNotDone ? <ExpandMoreOutlined /> : <ChevronRightOutlined />}
+						<IconButton onClick={() => tabIndex === 0 ?
+							setShowListNotDone([!showListNotDone[0], showListNotDone[1]])
+							: setShowListNotDone([showListNotDone[0], !showListNotDone[1]])}
+						>
+							{showListNotDone[tabIndex] ? <SysIcon name={'expandMore'} /> : <SysIcon name={'chevronRight'} />}
 						</IconButton>
 						<Typography variant='h3'>{`Não Concluídas (${todoListNotDone.length})`}</Typography>
 					</TaskStatus>
 
-					{showListNotDone &&
+					{showListNotDone[tabIndex] &&
 						<List>
-							{todoListNotDone.map((task, index) => {
+							{todoListNotDone.map((task) => {
 								return (
-									<SysTaskCard task={task} key={index} />
+									<SysTaskCard
+										key={task._id}
+										task={task}
+										onClick={() => onTaskDetailClick(task._id)}
+									/>
 								)
 							})}
 						</List>
 					}
 
 					<TaskStatus container={true}>
-						<IconButton onClick={() => setShowListDone(!showListDone)}>
-							{showListDone ? <ExpandMoreOutlined /> : <ChevronRightOutlined />}
+						<IconButton onClick={() => tabIndex === 0 ?
+							setShowListDone([!showListDone[0], showListDone[1]])
+							: setShowListDone([showListDone[0], !showListDone[1]])}
+						>
+							{showListDone[tabIndex] ? <SysIcon name={'expandMore'} /> : <SysIcon name={'chevronRight'} />}
 						</IconButton>
 						<Typography variant='h3'>{`Concluídas (${todoListDone.length})`}</Typography>
 					</TaskStatus>
 
-					{showListDone &&
+					{showListDone[tabIndex] &&
 						<List>
-							{todoListDone.map((task, index) => {
+							{todoListDone.map((task) => {
 								return (
-									<SysTaskCard task={task} key={index} />
+									<SysTaskCard
+										key={task._id}
+										task={task}
+										onClick={() => onTaskDetailClick(task._id)}
+									/>
 								)
 							})}
 						</List>
@@ -108,7 +124,6 @@ const ToDoListView = () => {
 			)}
 
 			<SysFab
-				// sx={{ width: 'auto', left: '50%', transform: 'translateX(-50%)' }}
 				variant="extended"
 				text="Adicionar"
 				startIcon={<SysIcon name={'add'} />}
