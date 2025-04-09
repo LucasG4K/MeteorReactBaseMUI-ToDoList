@@ -1,40 +1,54 @@
-/*!
+import React from 'react';
+import Paper from '@mui/material/Paper';
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import { sysSizing } from '../../../ui/materialui/styles';
 
- =========================================================
- * Material Dashboard React - v1.0.0 based on Material Dashboard - v1.2.0
- =========================================================
+interface ISignUpStyles {
+	Container: React.ElementType;
+	Content: React.ElementType;
+	FormContainer: React.ElementType;
+	FormWrapper: React.ElementType;
+}
 
- * Product Page: http://www.creative-tim.com/product/material-dashboard-react
- * Copyright 2018 Creative Tim (http://www.creative-tim.com)
- * Licensed under MIT (https://github.com/creativetimofficial/material-dashboard-react/blob/master/LICENSE.md)
-
- =========================================================
-
- * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
- */
-
-export const signUpStyle = {
-	containerSignUp: {
+const SignUpStyles: ISignUpStyles = {
+	Container: styled(Box)(({ theme }) => ({
+		minHeight: '100vh',
+		width: '100vw',
+		backgroundColor: theme.palette.primary.main,
+		color: theme.palette.primary.contrastText,
+		position: 'relative',
+	})),
+	Content: styled(Box)(({ theme }) => ({
 		width: '100%',
-		maxWidth: 400
-	},
-	labelRegisterSystem: {
-		textAlign: 'center',
+		height: '100%',
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'space-evenly',
+		alignItems: 'center',
+		gap: theme.spacing(6),
+		padding: `${sysSizing.spacingFixedLg} ${sysSizing.spacingFixedXl}`,
+	})),
+	FormContainer: styled(Paper)(({ theme }) => ({
+		width: '100%',
+		padding: `${sysSizing.spacingFixedLg} ${sysSizing.spacingFixedXl}`,
+		borderRadius: sysSizing.radiusLg,
+		boxShadow: theme.shadows[3],
+		gap: sysSizing.spacingFixedXl,
+		display: 'flex',
+		flexDirection: 'column',
+		justifyContent: 'flex-start',
+		alignItems: 'center',
+		maxWidth: '400px'
+	})),
+	FormWrapper: styled(Box)(({ theme }) => ({
+		width: '100%',
 		display: 'flex',
 		flexDirection: 'column',
 		justifyContent: 'center',
-		alignItems: 'center'
-	},
-	imageLogo: {
-		maxWidth: 100
-	},
-	containerButtonOptions: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-around'
-	},
-	containerRouterSignIn: {
-		color: '#444'
-	}
+		alignItems: 'center',
+		gap: theme.spacing(2)
+	}))
 };
+
+export default SignUpStyles;

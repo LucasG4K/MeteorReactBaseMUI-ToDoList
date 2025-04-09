@@ -52,7 +52,7 @@ const SignInPage: React.FC = () => {
 					<SysForm schema={signInSchema} onSubmit={handleSubmit} debugAlerts={false}>
 						<FormWrapper>
 							<SysTextField name="email" label="Email" fullWidth placeholder="Digite seu email" />
-							<SysTextField label="Senha" fullWidth name="password" placeholder="Digite sua senha" type="password" />
+							<SysTextField name="password" label="Senha" fullWidth placeholder="Digite sua senha" type="password" />
 
 							{/* <Box /> */}
 							<Typography variant='body2'>
@@ -71,7 +71,7 @@ const SignInPage: React.FC = () => {
 
 
 							{/* <Box /> */}
-							<SysFormButton variant="contained" color="primary" endIcon={<SysIcon name={'arrowForward'} />}>
+							<SysFormButton variant="contained" color="primary" endIcon={<SysIcon name={'arrowForward'} id="submit" />}>
 								Entrar
 							</SysFormButton>
 						</FormWrapper>

@@ -3,84 +3,87 @@
 
 // login page overrides the form’s submit event and call Meteor’s loginWithPassword()
 // Authentication errors modify the component’s state to be displayed
-import React from 'react';
-import { Link, NavigateFunction } from 'react-router-dom';
-import Container from '@mui/material/Container';
-import TextField from '/imports/ui/components/SimpleFormFields/TextField/TextField';
-import Button from '@mui/material/Button';
+import React, { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { userprofileApi } from '../../../modules/userprofile/api/userProfileApi';
-import SimpleForm from '/imports/ui/components/SimpleForm/SimpleForm';
 
-import { signUpStyle } from './signUpStyle';
+import SignUpStyles from './signUpStyle';
 import Box from '@mui/material/Box';
-import { IUserProfile } from '/imports/modules/userprofile/api/userProfileSch';
+import AppLayoutContext, { IAppLayoutContext } from '/imports/app/appLayoutProvider/appLayoutContext';
+import AuthContext, { IAuthContext } from '/imports/app/authProvider/authContext';
+import Typography from '@mui/material/Typography';
+import signUpSchema from './signUpSch';
+import SysTextField from '/imports/ui/components/sysFormFields/sysTextField/sysTextField';
+import SysFormButton from '/imports/ui/components/sysFormFields/sysFormButton/sysFormButton';
+import SysForm from '/imports/ui/components/sysForm/sysForm';
+import SysIcon from '/imports/ui/components/sysIcon/sysIcon';
 
-interface ISignUp {
-	showNotification: (options?: Object) => void;
-	navigate: NavigateFunction;
-	user: IUserProfile;
-}
 
-export const SignUp = (props: ISignUp) => {
-	const { showNotification } = props;
+export const SignUp: React.FC = () => {
+	const { signIn } = useContext<IAuthContext>(AuthContext);
+	const { showNotification } = useContext<IAppLayoutContext>(AppLayoutContext);
+	const { Container, Content, FormContainer, FormWrapper } = SignUpStyles;
+	const navigate = useNavigate();
 
 	const handleSubmit = (doc: { email: string; password: string }) => {
 		const { email, password } = doc;
 
-		userprofileApi.insertNewUser({ email, username: email, password }, (err, r) => {
+		userprofileApi.insertNewUser({ email, username: email, password }, (err) => {
 			if (err) {
-				console.log('Login err', err);
-				showNotification &&
-					showNotification({
-						type: 'warning',
-						title: 'Problema na criação do usuário!',
-						description: 'Erro ao fazer registro em nossa base de dados!'
-					});
+				showNotification({
+					type: 'warning',
+					title: 'Erro no cadastro!',
+					message: 'Não foi possível cadastrar o usuário!'
+				});
 			} else {
-				showNotification &&
+				signIn(email, password, (e) => {
 					showNotification({
-						type: 'sucess',
-						title: 'Cadastrado com sucesso!',
-						description: 'Registro de usuário realizado em nossa base de dados!'
+						type: 'success',
+						title: 'Cadastro realizado!',
+						message: 'O usuário foi registrado!'
 					});
+					navigate('/');
+				});
 			}
 		});
 	};
 
 	return (
-		<Container style={signUpStyle.containerSignUp}>
-			<Box sx={signUpStyle.labelRegisterSystem}>
-				<img src="/images/wireframe/logo.png" style={signUpStyle.imageLogo} />
-				{'Cadastrar no sistema'}
-			</Box>
-			<SimpleForm
-				schema={{
-					email: {
-						type: String,
-						label: 'Email',
-						optional: false
-					},
-					password: {
-						type: String,
-						label: 'Senha',
-						optional: false
-					}
-				}}
-				onSubmit={handleSubmit}>
-				<TextField id="Email" label="Email" fullWidth name="email" type="email" placeholder="Digite um email" />
-				<TextField id="Senha" label="Senha" fullWidth name="password" placeholder="Digite uma senha" type="password" />
-				<Box sx={signUpStyle.containerButtonOptions}>
-					<Button color={'primary'} variant={'outlined'} id="submit">
-						Cadastrar
-					</Button>
-				</Box>
-			</SimpleForm>
-			<Box sx={signUpStyle.containerRouterSignIn}>
-				Já tem uma conta? Faça login clicando{' '}
-				<Link to="/signin" color={'secondary'}>
-					aqui
-				</Link>
-			</Box>
+		<Container>
+			<Content>
+				<Typography variant="h2" display={'inline-flex'} gap={1}>
+					<Typography variant="inherit" color="sysText.tertiary">
+						{'{'}
+					</Typography>
+					ToDo List
+					<Typography variant="inherit" color="sysText.tertiary">
+						{'}'}
+					</Typography>
+				</Typography>
+				<FormContainer>
+					<Typography variant="h5">Cadastre-se no sistema</Typography>
+					<SysForm schema={signUpSchema} onSubmit={handleSubmit} debugAlerts={false}>
+						<FormWrapper>
+							<SysTextField name="email" label="Email" fullWidth placeholder="Digite seu email" />
+							<SysTextField name="password" label="Senha" fullWidth placeholder="Digite sua senha" type="password" />
+
+							{/* <Box /> */}
+							<Typography variant='body2'>
+								Já possui uma conta?{" "}
+								<Link to='/' color={'secondary'}>
+									Entre
+								</Link>
+							</Typography>
+
+							{/* <Box /> */}
+							<SysFormButton variant="contained" color="primary" endIcon={<SysIcon name={'arrowForward'} id="submit" />}>
+								Cadastrar
+							</SysFormButton>
+						</FormWrapper>
+					</SysForm>
+				</FormContainer>
+				<Box component="img" src="/images/wireframe/synergia-logo.svg" sx={{ width: '100%', maxWidth: '400px' }} />
+			</Content>
 		</Container>
 	);
 };

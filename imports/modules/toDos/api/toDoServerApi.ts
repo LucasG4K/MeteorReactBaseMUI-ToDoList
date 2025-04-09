@@ -1,5 +1,5 @@
 // region Imports
-import { Recurso } from '../config/recursos';
+import { ToDoResources } from '../config/recursos';
 import { toDoSch, IToDo } from './toDoSch';
 import { userprofileServerApi } from '../../userprofile/api/userProfileServerApi';
 import { ProductServerBase } from '../../../api/productServerBase';
@@ -9,7 +9,7 @@ import { ProductServerBase } from '../../../api/productServerBase';
 class ToDoServerApi extends ProductServerBase<IToDo> {
 	constructor() {
 		super('toDo', toDoSch, {
-			resources: Recurso
+			resources: ToDoResources
 			// saveImageToDisk: true,
 		});
 
