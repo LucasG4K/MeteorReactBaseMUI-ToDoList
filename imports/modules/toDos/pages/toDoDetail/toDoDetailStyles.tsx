@@ -12,8 +12,7 @@ interface IToDoDetailStyles {
 
 const ToDoDetailStyles: IToDoDetailStyles = {
 	Frame: styled(Box)(() => ({
-		// height: '600px',
-		width: '540px',
+		width: '35vw',
 		display: 'flex',
 		flexDirection: 'column',
 		gap: sysSizing.spacingFixedLg,

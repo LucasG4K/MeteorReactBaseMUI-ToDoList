@@ -28,7 +28,7 @@ export const SignUp: React.FC = () => {
 	const handleSubmit = (doc: { email: string; password: string }) => {
 		const { email, password } = doc;
 
-		userprofileApi.insertNewUser({ email, username: email, password }, (err) => {
+		userprofileApi.insertNewUser({ email, username: email.match(/^(.+)@[\w]+\.\w+$/)![1].trim(), password }, (err) => {
 			if (err) {
 				showNotification({
 					type: 'warning',

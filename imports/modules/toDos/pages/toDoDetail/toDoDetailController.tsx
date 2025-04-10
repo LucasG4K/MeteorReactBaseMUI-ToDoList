@@ -16,11 +16,12 @@ interface IToDoDetailContollerContext {
 	onEditButtonClick: (doc: IToDo) => void;
 	onCheckButtonClick: (doc: IToDo) => void;
 	mode: 'create' | 'edit' | 'view';
+	handleCloseDrawer: () => void;
 	closeDialog: () => void;
-	closeDrawer: () => void;
 }
 
 interface IDetailController {
+	close?: () => void;
 	mode: 'create' | 'edit' | 'view';
 	id?: string;
 }
@@ -29,7 +30,7 @@ export const ToDoDetailControllerContext = createContext<IToDoDetailContollerCon
 	{} as IToDoDetailContollerContext
 );
 
-const ToDoDetailController = ({ id, mode }: IDetailController) => {
+const ToDoDetailController = ({ id, mode, close }: IDetailController) => {
 	const { showNotification, showDialog, closeDialog, closeDrawer } = useContext<IAppLayoutContext>(AppLayoutContext);
 
 	const { document, loading } = useTracker(() => {
@@ -40,6 +41,11 @@ const ToDoDetailController = ({ id, mode }: IDetailController) => {
 			loading: !!subHandle && !subHandle?.ready()
 		};
 	}, [id]);
+
+	const handleCloseDrawer = useCallback(() => {
+		close!();
+		closeDrawer();
+	}, []);
 
 	const onEditButtonClick = useCallback((doc: IToDo) => {
 		showDialog({
@@ -83,7 +89,7 @@ const ToDoDetailController = ({ id, mode }: IDetailController) => {
 				onEditButtonClick,
 				onCheckButtonClick,
 				closeDialog,
-				closeDrawer,
+				handleCloseDrawer,
 			}}>
 			{<ToDoDetailView />}
 		</ToDoDetailControllerContext.Provider>

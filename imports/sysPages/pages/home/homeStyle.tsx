@@ -17,6 +17,7 @@ const HomeStyles: IHomeStyles = {
 		justifyContent: 'flex-start',
 		gap: '2.5rem',
 		width: '100%',
+		height: '100%',
 	})),
 	Header: styled(Box)(({}) => ({
 		display: 'flex',

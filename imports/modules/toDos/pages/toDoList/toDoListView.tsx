@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -13,8 +13,7 @@ import List from '@mui/material/List';
 import IconButton from '@mui/material/IconButton';
 import { SysTaskCard } from '../../components/SysTaskCard';
 import { SysTabs } from '/imports/ui/components/sysTabs/sysTabs';
-import { ShowDrawer } from '/imports/ui/appComponents/showDrawer/showDrawer';
-import { SysTaskDrawerDetail } from '../../components/SysTaskDrawerDetail';
+
 
 const ToDoListView = () => {
 
@@ -29,9 +28,8 @@ const ToDoListView = () => {
 		}
 	]
 
-	const sysLayoutContext = useContext<IAppLayoutContext>(AppLayoutContext);
 	const controller = useContext(ToDoListControllerContext);
-	const { todoListNotDone, todoListDone, loading, onChangeTextField, onAddButtonClick, onChangeCategory, onTaskDetailClick } = controller;
+	const { todoListNotDone, todoListDone, loading, onChangeTextField, onAddButtonClick, onChangeCategory, onTaskDetailClick, drawerOpen } = controller;
 	const { Container, LoadingContainer, SearchContainer, TaskStatus, TabView } = ToDoListStyles;
 
 	const [tab, setTab] = useState(tabs[0].value);
@@ -41,7 +39,7 @@ const ToDoListView = () => {
 	const tabIndex = tabs.indexOf(tabs.find((item) => item.value === tab)!);
 
 	return (
-		<Container>
+		<Container sx={{ width: drawerOpen ? '70%' : '100%' }}>
 
 			<TabView>
 				<SysTabs
@@ -126,8 +124,8 @@ const ToDoListView = () => {
 			<SysFab
 				variant="extended"
 				text="Adicionar"
+				fixed
 				startIcon={<SysIcon name={'add'} />}
-				fixed={true}
 				onClick={onAddButtonClick}
 			/>
 		</Container>

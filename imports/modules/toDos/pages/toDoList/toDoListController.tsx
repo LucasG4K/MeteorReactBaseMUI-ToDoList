@@ -25,8 +25,10 @@ interface IToDoListContollerContext {
 	onDeleteButtonClick: (row: any) => void;
 	todoListNotDone: IToDo[];
 	todoListDone: IToDo[];
+	toDosRecent: IToDo[];
 	schema: ISchema<any>;
 	loading: boolean;
+	drawerOpen: boolean;
 	onChangeTextField: (event: React.ChangeEvent<HTMLInputElement>) => void;
 	onChangeCategory: (value: string) => void;
 }
@@ -34,7 +36,6 @@ interface IToDoListContollerContext {
 export const ToDoListControllerContext = React.createContext<IToDoListContollerContext>(
 	{} as IToDoListContollerContext
 );
-
 
 const initialConfig = {
 	sortProperties: { field: 'createdat', sortAscending: true },
@@ -59,18 +60,19 @@ const ToDoListController = () => {
 		$or: [{ shared: 'Tarefas do Time' }, { createdby: user?._id }]
 	}
 
-	const { loading, toDosNotDone, toDosDone } = useTracker(() => {
+	const { loading, toDosNotDone, toDosDone, toDosRecent } = useTracker(() => {
 
 		const subHandle = toDoApi.subscribe('toDoList', sharedFilter);
 
 		const toDosNotDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: { $ne: true } }, { createdat: 1 }).fetch() : [];
 		const toDosDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: true }, { createdat: 1 }).fetch() : [];
+		const toDosRecent = subHandle?.ready() ? toDoApi.find(sharedFilter, { sort: { createdat: 1 }, limit: 5 }).fetch() : [];
 
 		return {
+			toDosRecent,
 			toDosNotDone,
 			toDosDone,
 			loading: !!subHandle && !subHandle.ready(),
-			total: subHandle ? subHandle.total : toDosNotDone.length + toDosDone.length
 		};
 	}, [config]);
 
@@ -93,12 +95,13 @@ const ToDoListController = () => {
 
 	const onTaskDetailClick = useCallback(
 		(id: string) => {
+			setToggleShowDrawer(true);
 			showDrawer({
 				variant: 'persistent',
+				close: () => setToggleShowDrawer(false),
 				anchor: 'right',
 				open: toggleShowDrawer,
-				close: () => setToggleShowDrawer(false),
-				children: <ToDoDetailController id={id} mode="view" />
+				children: <ToDoDetailController close={() => setToggleShowDrawer(false)} id={id} mode="view" />
 			})
 		}, []
 	)
@@ -145,8 +148,10 @@ const ToDoListController = () => {
 			onDeleteButtonClick,
 			todoListNotDone: toDosNotDone,
 			todoListDone: toDosDone,
+			toDosRecent,
 			schema: toDoSchReduzido,
 			loading,
+			drawerOpen: toggleShowDrawer,
 			onChangeTextField,
 			onChangeCategory,
 		}),

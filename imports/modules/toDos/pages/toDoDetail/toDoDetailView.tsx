@@ -24,7 +24,7 @@ const ToDoDetailView = () => {
 	const { Frame, LoadingContainer, FieldsForm, Actions } = ToDoDetailStyles;
 	const descriptionRows: number = 5;
 	const controller = useContext(ToDoDetailControllerContext);
-	const { loading, document, onEditButtonClick, onSubmit, schema, mode, closeDialog, closeDrawer, onCheckButtonClick } = controller;
+	const { loading, document, onEditButtonClick, onSubmit, schema, mode, closeDialog, handleCloseDrawer, onCheckButtonClick } = controller;
 
 	if (loading)
 		return (
@@ -41,7 +41,7 @@ const ToDoDetailView = () => {
 			<Frame >
 				<Grid container sx={{ justifyContent: 'flex-end' }}>
 					<IconButton><MoreVertOutlined /></IconButton>
-					<IconButton onClick={closeDrawer}><SysIcon name='close' /></IconButton>
+					<IconButton onClick={handleCloseDrawer}><SysIcon name='close' /></IconButton>
 				</Grid>
 				<FormControlLabel
 					control={
