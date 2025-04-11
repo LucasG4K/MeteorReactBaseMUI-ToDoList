@@ -19,7 +19,7 @@ class ToDoServerApi extends ProductServerBase<IToDo> {
 			'toDoList',
 			(filter = {}) => {
 				return this.defaultListCollectionPublication(filter, {
-					projection: { title: 1, description: 1, done: 1, picture: 1, shared: 1, createdby: 1 }
+					projection: { title: 1, description: 1, done: 1, picture: 1, shared: 1, createdat: 1, createdby: 1 }
 				});
 			},
 			async (doc: IToDo & { owner: string }) => {

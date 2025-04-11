@@ -15,10 +15,11 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { MoreVertOutlined, RadioButtonUncheckedOutlined, TaskAltOutlined } from '@mui/icons-material';
+import AuthContext from '/imports/app/authProvider/authContext';
 
 interface ISysTaskCard {
     task: IToDo;
-    onClick: () => void;
+    onClick?: () => void | undefined;
 }
 
 const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
@@ -26,6 +27,7 @@ const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
     const sysLayoutContext = useContext(AppLayoutContext)
     const controller = useContext(ToDoListControllerContext);
     const { onEditButtonClick, onDeleteButtonClick, onCheckButtonClick } = controller;
+    const { user } = useContext(AuthContext);
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -55,12 +57,13 @@ const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
                             <MenuItem
                                 onClick={() => {
                                     onEditButtonClick(task._id);
-                                    handleMenuClose;
+                                    handleMenuClose();
                                 }}>
                                 <SysIcon name={'edit'} /> Editar
                             </MenuItem>
 
                             <MenuItem
+                                disabled={task.createdby !== user?._id}
                                 onClick={() => {
                                     DeleteDialog({
                                         showDialog: sysLayoutContext.showDialog,
@@ -74,7 +77,7 @@ const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
                                             });
                                         }
                                     });
-                                    handleMenuClose;
+                                    handleMenuClose();
                                 }}>
                                 <SysIcon color={'error'} name={'delete'} /> Deletar
                             </MenuItem>
@@ -82,7 +85,16 @@ const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
                         </Menu>
                     </>
                 }>
-                <ListItemButton onClick={onClick} >
+                <ListItemButton
+                    onClick={onClick}
+                    disableRipple={!!!onclick}
+                    sx={{
+                        cursor: !!onClick ? 'pointer' : 'default',
+                        '&:hover': {
+                            backgroundColor: !!onClick ? 'rgba(0,0,0,0.04)' : 'transparent',
+                        },
+                    }}
+                >
                     <ListItemIcon>
                         <Checkbox
                             edge='start'
@@ -95,19 +107,22 @@ const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
                     </ListItemIcon>
                     <ListItemText
                         id={task._id}
-                        primary={task.done ? <s>{task.title}</s> : task.title}
+                        primary={
+                            <Typography variant='body1' sx={{ fontWeight: '600', textDecoration: task.done ? "line-through" : 'none' }}>
+                                {task.title}
+                            </Typography>
+                        }
                         secondary={
-                            <>
+                            <Typography
+                                variant='body2'
+                                noWrap
+                                sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>
                                 {`Criada por: `}
-                                <Typography
-                                    variant='body2'
-                                    component='span'
-                                    sx={{ display: 'inline', textDecorationLine: 'underline' }}
-                                >
+                                <Typography sx={{ display: 'inline', textDecorationLine: 'underline' }}>
                                     {task.owner}
                                 </Typography>
                                 {task.description ? ` - ${task.description}` : ''}
-                            </>
+                            </Typography>
                         }
                     />
                 </ListItemButton>

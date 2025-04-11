@@ -15,9 +15,11 @@ const ToDoDetailStyles: IToDoDetailStyles = {
 		width: '35vw',
 		display: 'flex',
 		flexDirection: 'column',
-		gap: sysSizing.spacingFixedLg,
+		// gap: sysSizing.spacingFixedLg,
 		padding: sysSizing.spacingFixedLg,
+		// margin: sysSizing.spacingFixedMd,
 		justifyContent: 'space-evenly',
+		gap: '2rem'
 	})),
 	LoadingContainer: styled(Box)(({ theme }) => ({
 		width: '100%',

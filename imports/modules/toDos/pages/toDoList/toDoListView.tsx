@@ -16,7 +16,6 @@ import { SysTabs } from '/imports/ui/components/sysTabs/sysTabs';
 
 
 const ToDoListView = () => {
-
 	const tabs = [
 		{
 			label: 'Minhas Tarefas',

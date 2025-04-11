@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useContext, useMemo } from 'react';
-import ToDoListView from './toDoListView';
 import { nanoid } from 'nanoid';
 import { useTracker } from 'meteor/react-meteor-data';
 import { ISchema } from '../../../../typings/ISchema';
@@ -37,36 +36,70 @@ export const ToDoListControllerContext = React.createContext<IToDoListContollerC
 	{} as IToDoListContollerContext
 );
 
+export const useToDo = () => {
+	const context = useContext(ToDoListControllerContext);
+	if (!context) {
+		throw new Error('useToDo deve ser usado dentro do provider');
+	}
+	return context;
+};
+
 const initialConfig = {
-	sortProperties: { field: 'createdat', sortAscending: true },
+	sortProperties: { field: 'createdat', sortAscending: false },
 	filter: { shared: 'Minhas Tarefas' },
 	searchBy: null,
 	viewComplexTable: false
 };
 
-const ToDoListController = () => {
+const ToDoListController = ({ children }: { children: React.ReactNode }) => {
 	const [config, setConfig] = useState<IInitialConfig>(initialConfig);
 	const [toggleShowDrawer, setToggleShowDrawer] = useState<boolean>(false);
 	const { showDialog, showDrawer } = useContext<IAppLayoutContext>(AppLayoutContext);
 	const { user } = useContext<IAuthContext>(AuthContext);
 
 	const { title, date, done, shared, picture } = toDoApi.getSchema();
-	const toDoSchReduzido = { title, date, done, shared, picture, createdat: { type: Date, label: 'Criado em' }, cretedby: { type: String, label: 'Criado por' } };
+	const toDoSchReduzido = {
+		title,
+		date,
+		done,
+		shared,
+		picture,
+		createdat: { type: Date, label: 'Criado em' },
+		cretedby: { type: String, label: 'Criado por' }
+	};
 
-	const { filter } = config;
+	const { filter, sortProperties } = config;
+	const sort = {
+		[sortProperties.field]: sortProperties.sortAscending ? 1 : -1
+	}
 
-	const sharedFilter = {
+	const sharedFilter = { // corrigir
 		...filter,
 		$or: [{ shared: 'Tarefas do Time' }, { createdby: user?._id }]
 	}
 
 	const { loading, toDosNotDone, toDosDone, toDosRecent } = useTracker(() => {
 
-		const subHandle = toDoApi.subscribe('toDoList', sharedFilter);
+		const subHandle = toDoApi.subscribe('toDoList');
 
-		const toDosNotDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: { $ne: true } }, { createdat: 1 }).fetch() : [];
-		const toDosDone = subHandle?.ready() ? toDoApi.find({ ...sharedFilter, done: true }, { createdat: 1 }).fetch() : [];
-		const toDosRecent = subHandle?.ready() ? toDoApi.find(sharedFilter, { sort: { createdat: 1 }, limit: 5 }).fetch() : [];
+		// if (subHandle?.ready()) return {
+		// 	loading: true,
+		// 	toDosDone: [],
+		// 	toDosDone: [],
+		// 	toDosRecent: [],
+		// }
+
+		const toDosNotDone = subHandle?.ready() ? toDoApi.find( // uma busca e tratar no syscard
+			{ ...sharedFilter, done: { $ne: true } },
+			{ sort }).fetch() : [];
+
+		const toDosDone = subHandle?.ready() ? toDoApi.find(
+			{ ...sharedFilter, done: true },
+			{ sort }).fetch() : [];
+
+		const toDosRecent = subHandle?.ready() ? toDoApi.find(
+			{ $or: [{ shared: 'Tarefas do Time' }, { createdby: user?._id }] },
+			{ sort, limit: 5 }).fetch() : [];
 
 		return {
 			toDosRecent,
@@ -98,7 +131,7 @@ const ToDoListController = () => {
 			setToggleShowDrawer(true);
 			showDrawer({
 				variant: 'persistent',
-				close: () => setToggleShowDrawer(false),
+				close: () => { setToggleShowDrawer(false); },
 				anchor: 'right',
 				open: toggleShowDrawer,
 				children: <ToDoDetailController close={() => setToggleShowDrawer(false)} id={id} mode="view" />
@@ -148,7 +181,7 @@ const ToDoListController = () => {
 			onDeleteButtonClick,
 			todoListNotDone: toDosNotDone,
 			todoListDone: toDosDone,
-			toDosRecent,
+			toDosRecent: toDosRecent,
 			schema: toDoSchReduzido,
 			loading,
 			drawerOpen: toggleShowDrawer,
@@ -160,7 +193,7 @@ const ToDoListController = () => {
 
 	return (
 		<ToDoListControllerContext.Provider value={providerValues}>
-			<ToDoListView />
+			{children}
 		</ToDoListControllerContext.Provider>
 	);
 };

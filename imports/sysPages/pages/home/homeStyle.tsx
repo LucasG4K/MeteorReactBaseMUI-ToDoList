@@ -1,12 +1,13 @@
 import { ElementType } from 'react';
 import { styled } from '@mui/material/styles';
 import Box, { BoxProps } from '@mui/material/Box';
-import {SysSectionPaddingXY} from "/imports/ui/layoutComponents/sysLayoutComponents";
+import { SysSectionPaddingXY } from "/imports/ui/layoutComponents/sysLayoutComponents";
 
 interface IHomeStyles {
 	Container: ElementType<BoxProps>;
 	Header: ElementType<BoxProps>;
 	RowButtons: ElementType<BoxProps>;
+	LoadingContainer: ElementType<BoxProps>;
 }
 
 const HomeStyles: IHomeStyles = {
@@ -19,7 +20,7 @@ const HomeStyles: IHomeStyles = {
 		width: '100%',
 		height: '100%',
 	})),
-	Header: styled(Box)(({}) => ({
+	Header: styled(Box)(({ }) => ({
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'flex-start',
@@ -41,7 +42,16 @@ const HomeStyles: IHomeStyles = {
 		[theme.breakpoints.down('sm')]: {
 			columnGap: '1rem'
 		}
-	}))
+	})),
+	LoadingContainer: styled(Box)(({ theme }) => ({
+		width: '100%',
+		display: 'flex',
+		flexGrow: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+		flexDirection: 'column',
+		gap: theme.spacing(2)
+	})),
 };
 
 export default HomeStyles;

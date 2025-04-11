@@ -17,6 +17,7 @@ import Grid from '@mui/material/Grid';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const ToDoDetailView = () => {
 	const { user } = useContext<IAuthContext>(AuthContext);
@@ -57,10 +58,18 @@ const ToDoDetailView = () => {
 						<Typography>{document.title ?? 'Sem título'}</Typography>
 					}
 				/>
-				<Typography>Descrição: {document.description ?? ''}</Typography>
-				<Typography>Tipo: {document.shared ?? ''}</Typography>
-				<Typography>Criada por: {document.createdby ?? ''}</Typography>
-				<Button onClick={() => onEditButtonClick(document)}>Editar {document.title ?? ''}</Button>
+				<Box>
+					<Typography variant='body1' sx={{ fontWeight: '700' }}>Descrição</Typography>
+					<Typography variant='body1'>{document.description}</Typography>
+				</Box>
+				<Box>
+					<Typography variant='body1' sx={{ fontWeight: '700' }}>Tipo</Typography>
+					<Typography variant='body1'>{document.shared}</Typography>
+				</Box>
+				<Button onClick={() => onEditButtonClick(document)}>Editar</Button>
+				<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+					<Typography variant='body2' sx={{ fontWeight: '200' }}>Criada por: {document.owner}</Typography>
+				</Box>
 			</Frame>
 			:
 			<Frame>
