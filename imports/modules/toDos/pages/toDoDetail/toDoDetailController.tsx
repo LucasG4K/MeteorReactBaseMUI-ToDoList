@@ -7,14 +7,16 @@ import { ISchema } from '../../../../typings/ISchema';
 import { IMeteorError } from '../../../../typings/BoilerplateDefaultTypings';
 import AppLayoutContext, { IAppLayoutContext } from '/imports/app/appLayoutProvider/appLayoutContext';
 import { sysSizing } from '/imports/ui/materialui/styles';
+import { ToDoModuleContext } from '../../toDoContainer';
 
 interface IToDoDetailContollerContext {
 	document: IToDo;
 	loading: boolean;
 	schema: ISchema<IToDo>;
 	onSubmit: (doc: IToDo) => void;
-	onEditButtonClick: (doc: IToDo) => void;
-	onCheckButtonClick: (doc: IToDo) => void;
+	onEditButtonClick?: (id: string) => void;
+	onDeleteButtonClick?: (task: IToDo) => void;
+	onCheckButtonClick?: (task: IToDo) => void;
 	mode: 'create' | 'edit' | 'view';
 	handleCloseDrawer: () => void;
 	closeDialog: () => void;
@@ -31,7 +33,8 @@ export const ToDoDetailControllerContext = createContext<IToDoDetailContollerCon
 );
 
 const ToDoDetailController = ({ id, mode, close }: IDetailController) => {
-	const { showNotification, showDialog, closeDialog, closeDrawer } = useContext<IAppLayoutContext>(AppLayoutContext);
+	const { showNotification, closeDialog } = useContext<IAppLayoutContext>(AppLayoutContext);
+	const { onEditButtonClick, onCheckButtonClick, onDeleteButtonClick } = useContext(ToDoModuleContext);
 
 	const { document, loading } = useTracker(() => {
 		const subHandle = toDoApi.subscribe('toDoDetail', { _id: id });
@@ -41,23 +44,6 @@ const ToDoDetailController = ({ id, mode, close }: IDetailController) => {
 			loading: !!subHandle && !subHandle?.ready()
 		};
 	}, [id]);
-
-	const handleCloseDrawer = useCallback(() => {
-		close!();
-		closeDrawer();
-	}, []);
-
-	const onEditButtonClick = useCallback((doc: IToDo) => {
-		showDialog({
-			sx: { borderRadius: sysSizing.radiusMd },
-			children: <ToDoDetailController id={doc._id} mode="edit" />
-		});
-	}, []
-	);
-
-	const onCheckButtonClick = useCallback((doc: IToDo) => {
-		toDoApi.update(doc);
-	}, [document]);
 
 	const onSubmit = useCallback((doc: IToDo) => {
 		toDoApi['upsert'](doc, (e: IMeteorError) => {
@@ -88,8 +74,9 @@ const ToDoDetailController = ({ id, mode, close }: IDetailController) => {
 				onSubmit,
 				onEditButtonClick,
 				onCheckButtonClick,
+				onDeleteButtonClick,
 				closeDialog,
-				handleCloseDrawer,
+				handleCloseDrawer: close!,
 			}}>
 			{<ToDoDetailView />}
 		</ToDoDetailControllerContext.Provider>

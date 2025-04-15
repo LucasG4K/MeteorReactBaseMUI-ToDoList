@@ -5,6 +5,7 @@ import { sysSizing } from '../../../../ui/materialui/styles';
 
 interface IToDoDetailStyles {
 	Frame: ElementType<BoxProps>;
+	Drawer: ElementType<BoxProps>;
 	LoadingContainer: ElementType<BoxProps>;
 	FieldsForm: ElementType<BoxProps>;
 	Actions: ElementType<BoxProps>;
@@ -12,14 +13,23 @@ interface IToDoDetailStyles {
 
 const ToDoDetailStyles: IToDoDetailStyles = {
 	Frame: styled(Box)(() => ({
-		width: '35vw',
+		width: '540px',
 		display: 'flex',
 		flexDirection: 'column',
 		// gap: sysSizing.spacingFixedLg,
-		padding: sysSizing.spacingFixedLg,
-		// margin: sysSizing.spacingFixedMd,
+		// padding: sysSizing.spacingFixedLg,
+		margin: sysSizing.spacingFixedMd,
 		justifyContent: 'space-evenly',
 		gap: '2rem'
+	})),
+	Drawer: styled(Box)(() => ({
+		display: 'flex',
+		flexDirection: 'column',
+		width: '35vw',
+		height: '92vh',
+		gap: sysSizing.spacingFixedLg,
+		// justifyContent: 'space-around',
+		padding: sysSizing.spacingFixedMd,
 	})),
 	LoadingContainer: styled(Box)(({ theme }) => ({
 		width: '100%',

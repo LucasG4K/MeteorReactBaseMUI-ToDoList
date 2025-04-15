@@ -21,7 +21,7 @@ const ToDoListStyles: IToDoListStyles = {
 		justifyContent: 'flex-start',
 		alignItems: 'flex-start',
 		width: '100%',
-		height: '100vh',
+		// height: '100vh',
 		overflow: 'auto',
 		gap: sysSizing.spacingFixedMd,
 		marginBottom: sysSizing.contentFabDistance
@@ -47,7 +47,7 @@ const ToDoListStyles: IToDoListStyles = {
 			flexDirection: 'column'
 		}
 	})),
-	TaskStatus: styled(Grid)(({theme}) => ({
+	TaskStatus: styled(Grid)(({ theme }) => ({
 		marginTop: sysSizing.spacingFixedMd
 	})),
 	TabView: styled(Box)(({ theme }) => ({

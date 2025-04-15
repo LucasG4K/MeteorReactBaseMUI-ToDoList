@@ -8,6 +8,8 @@ import AppLayoutContext, { IAppLayoutContext } from '/imports/app/appLayoutProvi
 import ToDoDetailController from '../toDoDetail/toDoDetailController';
 import { sysSizing } from '/imports/ui/materialui/styles';
 import AuthContext, { IAuthContext } from '/imports/app/authProvider/authContext';
+import ToDoListView from './toDoListView';
+import { ToDoModuleContext } from '../../toDoContainer';
 
 interface IInitialConfig {
 	sortProperties: { field: string; sortAscending: boolean };
@@ -18,44 +20,32 @@ interface IInitialConfig {
 
 interface IToDoListContollerContext {
 	onAddButtonClick: () => void;
-	onEditButtonClick: (row: any) => void;
-	onTaskDetailClick: (row: any) => void;
-	onCheckButtonClick: (row: any) => void;
-	onDeleteButtonClick: (row: any) => void;
-	todoListNotDone: IToDo[];
-	todoListDone: IToDo[];
-	toDosRecent: IToDo[];
+	onEditButtonClick?: (id: string) => void;
+	onCheckButtonClick?: (task: IToDo) => void;
+	onDeleteButtonClick?: (task: IToDo) => void;
+	todoList: IToDo[];
 	schema: ISchema<any>;
 	loading: boolean;
-	drawerOpen: boolean;
 	onChangeTextField: (event: React.ChangeEvent<HTMLInputElement>) => void;
-	onChangeCategory: (value: string) => void;
+	pathname?: string;
 }
 
 export const ToDoListControllerContext = React.createContext<IToDoListContollerContext>(
 	{} as IToDoListContollerContext
 );
 
-export const useToDo = () => {
-	const context = useContext(ToDoListControllerContext);
-	if (!context) {
-		throw new Error('useToDo deve ser usado dentro do provider');
-	}
-	return context;
-};
-
 const initialConfig = {
 	sortProperties: { field: 'createdat', sortAscending: false },
-	filter: { shared: 'Minhas Tarefas' },
+	filter: {},
 	searchBy: null,
 	viewComplexTable: false
 };
 
-const ToDoListController = ({ children }: { children: React.ReactNode }) => {
+const ToDoListController = () => {
 	const [config, setConfig] = useState<IInitialConfig>(initialConfig);
-	const [toggleShowDrawer, setToggleShowDrawer] = useState<boolean>(false);
-	const { showDialog, showDrawer } = useContext<IAppLayoutContext>(AppLayoutContext);
-	const { user } = useContext<IAuthContext>(AuthContext);
+	const { showDialog } = useContext<IAppLayoutContext>(AppLayoutContext);
+	const { pathname, onEditButtonClick, onCheckButtonClick, onDeleteButtonClick } = useContext(ToDoModuleContext);
+
 
 	const { title, date, done, shared, picture } = toDoApi.getSchema();
 	const toDoSchReduzido = {
@@ -73,78 +63,40 @@ const ToDoListController = ({ children }: { children: React.ReactNode }) => {
 		[sortProperties.field]: sortProperties.sortAscending ? 1 : -1
 	}
 
-	const sharedFilter = { // corrigir
-		...filter,
-		$or: [{ shared: 'Tarefas do Time' }, { createdby: user?._id }]
-	}
+	const { loading, todoList } = useTracker(() => {
 
-	const { loading, toDosNotDone, toDosDone, toDosRecent } = useTracker(() => {
+		const subHandle = toDoApi.subscribe('toDoList', filter);
 
-		const subHandle = toDoApi.subscribe('toDoList');
+		let todoList: Array<IToDo> = [];
 
-		// if (subHandle?.ready()) return {
-		// 	loading: true,
-		// 	toDosDone: [],
-		// 	toDosDone: [],
-		// 	toDosRecent: [],
-		// }
+		if (!subHandle?.ready()) return {
+			loading: true,
+			todoList,
+		}
 
-		const toDosNotDone = subHandle?.ready() ? toDoApi.find( // uma busca e tratar no syscard
-			{ ...sharedFilter, done: { $ne: true } },
-			{ sort }).fetch() : [];
-
-		const toDosDone = subHandle?.ready() ? toDoApi.find(
-			{ ...sharedFilter, done: true },
-			{ sort }).fetch() : [];
-
-		const toDosRecent = subHandle?.ready() ? toDoApi.find(
-			{ $or: [{ shared: 'Tarefas do Time' }, { createdby: user?._id }] },
-			{ sort, limit: 5 }).fetch() : [];
+		if (pathname === '/todo/personal') {
+			todoList = toDoApi.find(
+				{ ...filter, shared: 'Minhas Tarefas' },
+				{ sort }
+			).fetch();
+		} else {
+			todoList = toDoApi.find(
+				{ ...filter, shared: 'Tarefas do Time' },
+				{ sort }
+			).fetch();
+		}
 
 		return {
-			toDosRecent,
-			toDosNotDone,
-			toDosDone,
-			loading: !!subHandle && !subHandle.ready(),
+			todoList,
+			loading: false,
 		};
-	}, [config]);
+	}, [config, pathname]);
 
 	const onAddButtonClick = useCallback(() => {
 		showDialog({
 			sx: { borderRadius: sysSizing.radiusMd },
 			children: <ToDoDetailController id={nanoid()} mode="create" />
 		});
-	}, [toDosNotDone]);
-
-	const onEditButtonClick = useCallback(
-		(id: string) => {
-			showDialog({
-				sx: { borderRadius: sysSizing.radiusMd },
-				children: <ToDoDetailController id={id} mode="edit" />
-			});
-		},
-		[toDosNotDone, toDosDone]
-	);
-
-	const onTaskDetailClick = useCallback(
-		(id: string) => {
-			setToggleShowDrawer(true);
-			showDrawer({
-				variant: 'persistent',
-				close: () => { setToggleShowDrawer(false); },
-				anchor: 'right',
-				open: toggleShowDrawer,
-				children: <ToDoDetailController close={() => setToggleShowDrawer(false)} id={id} mode="view" />
-			})
-		}, []
-	)
-
-	const onCheckButtonClick = useCallback((row: any) => {
-		toDoApi.update(row);
-	}, []);
-
-	const onDeleteButtonClick = useCallback((row: any) => {
-		toDoApi.remove(row);
 	}, []);
 
 	const onChangeTextField = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,42 +110,24 @@ const ToDoListController = ({ children }: { children: React.ReactNode }) => {
 		return () => clearTimeout(delayedSearch);
 	}, []);
 
-	const onChangeCategory = useCallback((value: string) => {
-		if (!value) {
-			setConfig((prev) => ({
-				...prev,
-				filter: {
-					...prev.filter,
-					shared: value
-				}
-			}));
-			return;
-		}
-		setConfig((prev) => ({ ...prev, filter: { ...prev.filter, shared: value } }));
-	}, []);
-
 	const providerValues: IToDoListContollerContext = useMemo(
 		() => ({
 			onAddButtonClick,
 			onEditButtonClick,
-			onTaskDetailClick,
 			onCheckButtonClick,
 			onDeleteButtonClick,
-			todoListNotDone: toDosNotDone,
-			todoListDone: toDosDone,
-			toDosRecent: toDosRecent,
+			todoList,
 			schema: toDoSchReduzido,
 			loading,
-			drawerOpen: toggleShowDrawer,
 			onChangeTextField,
-			onChangeCategory,
+			pathname,
 		}),
-		[toDosNotDone, toDosDone, loading]
+		[todoList, loading]
 	);
 
 	return (
 		<ToDoListControllerContext.Provider value={providerValues}>
-			{children}
+			<ToDoListView />
 		</ToDoListControllerContext.Provider>
 	);
 };

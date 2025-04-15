@@ -3,20 +3,33 @@ import { ToDoResources } from './recursos';
 import { IRoute } from '../../modulesTypings';
 
 export const toDoRouterList: (IRoute | null)[] = [
+	// {
+	// 	path: '/todo/:screenState/:todoId',
+	// 	component: ToDoContainer,
+	// 	isProtected: true,
+	// 	resources: [ToDoResources.TODO_VIEW]
+	// },
+	// {
+	// 	path: '/todo/:screenState',
+	// 	component: ToDoContainer,
+	// 	isProtected: true,
+	// 	resources: [ToDoResources.TODO_CREATE]
+	// },
 	{
-		path: '/todo/:screenState/:todoId',
+		path: '/',
+		exact: true,
 		component: ToDoContainer,
 		isProtected: true,
 		resources: [ToDoResources.TODO_VIEW]
 	},
 	{
-		path: '/todo/:screenState',
+		path: '/todo/personal',
 		component: ToDoContainer,
 		isProtected: true,
-		resources: [ToDoResources.TODO_CREATE]
+		resources: [ToDoResources.TODO_VIEW]
 	},
 	{
-		path: '/todo',
+		path: '/todo/group',
 		component: ToDoContainer,
 		isProtected: true,
 		resources: [ToDoResources.TODO_VIEW]

@@ -6,25 +6,20 @@ import Box from '@mui/material/Box';
 import { SysFab } from '/imports/ui/components/sysFab/sysFab';
 import { KeyboardDoubleArrowRightOutlined } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import ToDoListController, { ToDoListControllerContext, useToDo } from '/imports/modules/toDos/pages/toDoList/toDoListController';
 import { SysTaskCard } from '/imports/modules/toDos/components/SysTaskCard';
 import List from '@mui/material/List';
 import CircularProgress from '@mui/material/CircularProgress';
+import { HomeControllerContext } from './homeController';
+import Grid from '@mui/material/Grid';
 
-export default function () {
-	return (
-		<ToDoListController>
-			<Home />
-		</ToDoListController>
-	)
-}
-
-const Home: React.FC = () => {
+const HomeView: React.FC = () => {
 	const { user } = useContext<IAuthContext>(AuthContext);
-	const { toDosRecent, loading } = useContext(ToDoListControllerContext);
+	const { toDosRecent, loading } = useContext(HomeControllerContext);
 	const navigate = useNavigate();
 
 	const { Container, LoadingContainer } = HomeStyles;
+
+	// console.log(toDosRecent);
 
 	return (
 		<Container>
@@ -62,13 +57,18 @@ const Home: React.FC = () => {
 			}
 
 			<SysFab
+				sx={{
+					left: '50%',
+					transform: 'translateX(-50%)'
+				}}
 				fixed
 				text='Ir para tarefas'
 				onClick={() => navigate('/todo')}
 				endIcon={<KeyboardDoubleArrowRightOutlined />}
 			/>
 
-		</Container>
+		</Container >
 	);
 };
 
+export default HomeView;
