@@ -30,8 +30,6 @@ const HomeController = () => {
             { sort: { createdat: -1 }, limit: 5 }
         ).fetch();
 
-        console.log(toDosRecent);
-
         return {
             loading: false,
             toDosRecent,

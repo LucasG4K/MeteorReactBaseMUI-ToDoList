@@ -33,7 +33,7 @@ const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
                 }>
                 <ListItemButton
                     onClick={onClick}
-                    disableRipple={!!!onclick}
+                    disableRipple={!!!onClick}
                     sx={{
                         cursor: !!onClick ? 'pointer' : 'default',
                         '&:hover': {
@@ -64,11 +64,12 @@ const SysTaskCard = ({ task, onClick }: ISysTaskCard) => {
                                 noWrap
                                 sx={{ textOverflow: 'ellipsis', overflow: 'hidden' }}>
                                 {`Criada por: `}
-                                <Typography sx={{ display: 'inline', textDecorationLine: 'underline' }}>
+                                <span style={{ textDecoration: 'underline' }}>
                                     {task.owner}
-                                </Typography>
+                                </span>
                                 {task.description ? ` - ${task.description}` : ''}
                             </Typography>
+
                         }
                     />
                 </ListItemButton>

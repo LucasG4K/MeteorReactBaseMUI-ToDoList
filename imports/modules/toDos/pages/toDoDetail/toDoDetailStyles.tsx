@@ -16,8 +16,6 @@ const ToDoDetailStyles: IToDoDetailStyles = {
 		width: '540px',
 		display: 'flex',
 		flexDirection: 'column',
-		// gap: sysSizing.spacingFixedLg,
-		// padding: sysSizing.spacingFixedLg,
 		margin: sysSizing.spacingFixedMd,
 		justifyContent: 'space-evenly',
 		gap: '2rem'
@@ -28,7 +26,6 @@ const ToDoDetailStyles: IToDoDetailStyles = {
 		width: '35vw',
 		height: '92vh',
 		gap: sysSizing.spacingFixedLg,
-		// justifyContent: 'space-around',
 		padding: sysSizing.spacingFixedMd,
 	})),
 	LoadingContainer: styled(Box)(({ theme }) => ({

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react';
+import React, { useContext, useRef } from 'react';
 import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import { ToDoDetailControllerContext } from './toDoDetailController';
@@ -12,7 +12,7 @@ import SysIcon from '../../../../ui/components/sysIcon/sysIcon';
 import AuthContext, { IAuthContext } from '/imports/app/authProvider/authContext';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
-import { MoreVertOutlined, RadioButtonUncheckedOutlined, TaskAltOutlined } from '@mui/icons-material';
+import { RadioButtonUncheckedOutlined, TaskAltOutlined } from '@mui/icons-material';
 import Grid from '@mui/material/Grid';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
@@ -20,11 +20,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import { SysTaskMoreOptions } from '../../components/SysTaskMoreOptions';
 
-const ToDoDetailView = () => {
-	const { user } = useContext<IAuthContext>(AuthContext);
+const ToDoDetailView: React.FC = React.memo(() => {
 	const sysFormRef = useRef<ISysFormRef>(null);
 	const { Frame, Drawer, LoadingContainer, FieldsForm, Actions } = ToDoDetailStyles;
 	const descriptionRows: number = 5;
+	const { user } = useContext<IAuthContext>(AuthContext);
 	const {
 		loading,
 		document,
@@ -35,9 +35,18 @@ const ToDoDetailView = () => {
 		closeDialog,
 		handleCloseDrawer,
 		onCheckButtonClick
-	} = useContext(ToDoDetailControllerContext);;
+	} = useContext(ToDoDetailControllerContext);
 
-	if (loading)
+	if (loading && mode === 'view') {
+		return (
+			<Drawer sx={{ alignItems: 'center' }}>
+				<LoadingContainer>
+					<CircularProgress />
+					<Typography variant="body1">Aguarde, carregando informações...</Typography>
+				</LoadingContainer>
+			</Drawer>
+		);
+	} else if (loading) {
 		return (
 			<Frame>
 				<LoadingContainer>
@@ -46,6 +55,7 @@ const ToDoDetailView = () => {
 				</LoadingContainer>
 			</Frame>
 		);
+	}
 
 	return (
 		mode === 'view' ?
@@ -99,9 +109,7 @@ const ToDoDetailView = () => {
 					<Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
 						<Typography variant='body2' sx={{ fontWeight: '200' }}>Criada por: {document.owner}</Typography>
 					</Box>
-
 				</Box>
-
 
 			</Drawer>
 			:
@@ -125,6 +133,6 @@ const ToDoDetailView = () => {
 				</SysForm>
 			</Frame>
 	);
-};
+});
 
 export default ToDoDetailView;

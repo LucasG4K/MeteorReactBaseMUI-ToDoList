@@ -14,10 +14,10 @@ import { SysTaskCard } from '../../components/SysTaskCard';
 import { SysTabs } from '/imports/ui/components/sysTabs/sysTabs';
 import ToDoDetailController from '../toDoDetail/toDoDetailController';
 import { useNavigate } from 'react-router-dom';
-import { IToDo } from '../../api/toDoSch';
+import { Pagination } from '@mui/material';
 
 
-const ToDoListView = () => {
+const ToDoListView: React.FC = React.memo(() => {
 	const tabs = [
 		{
 			label: 'Minhas Tarefas',
@@ -30,12 +30,23 @@ const ToDoListView = () => {
 	]
 
 	const {
+		page,
+		setPage,
+		totalPages,
 		todoList,
-		loading,
 		onChangeTextField,
 		onAddButtonClick,
 		pathname,
 	} = useContext(ToDoListControllerContext);
+
+
+	const {
+		loading,
+		listDone,
+		listNotDone,
+		doneCount,
+		notDoneCount
+	} = todoList;
 
 	const { Container, LoadingContainer, SearchContainer, TaskStatus, TabView } = ToDoListStyles;
 
@@ -43,31 +54,17 @@ const ToDoListView = () => {
 	const [showDone, setShowDone] = useState<boolean>(true);
 	const [showNotDone, setShowNotDone] = useState<boolean>(true);
 
-	const { listDone, listNotDone } = todoList.reduce(
-		(acc: { listDone: IToDo[]; listNotDone: IToDo[] }, task: IToDo) => {
-			if (task.done) {
-				acc.listDone.push(task);
-			} else {
-				acc.listNotDone.push(task);
-			}
-			return acc;
-		},
-		{ listDone: [], listNotDone: [] }
-	);
-
-	const navigate = useNavigate();
-
 	const [open, setOpen] = useState<boolean>(false);
 	const [selectedTask, setSelectedTask] = useState<string>('');
+
+	const navigate = useNavigate();
 
 	useMemo(() => {
 		setShowDone(true);
 		setShowNotDone(true);
 		setOpen(false);
 		setSelectedTask('');
-		pathname === '/todo/personal' ?
-			setTab(tabs[0].value)
-			: setTab(tabs[1].value)
+		pathname === '/todo' ? setTab(tabs[0].value) : setTab(tabs[1].value)
 	}, [pathname]);
 
 	return (
@@ -80,10 +77,10 @@ const ToDoListView = () => {
 						abas={tabs}
 						value={tab}
 						handleChange={() => {
-							if (pathname === '/todo/personal') {
+							if (pathname === '/todo') {
 								navigate('/todo/group');
 							} else {
-								navigate('/todo/personal')
+								navigate('/todo')
 							}
 						}}
 					/>
@@ -113,42 +110,60 @@ const ToDoListView = () => {
 							>
 								{showNotDone ? <SysIcon name={'expandMore'} /> : <SysIcon name={'chevronRight'} />}
 							</IconButton>
-							<Typography variant='h3'>{`Não Concluídas (${listNotDone.length})`}</Typography>
+							<Typography variant='h3'>{`Não Concluídas (${notDoneCount})`}</Typography>
 						</TaskStatus>
 
 						{showNotDone &&
-							<List>
-								{listNotDone.map((task) => {
-									return (
-										<SysTaskCard
-											key={task._id}
-											task={task}
-											onClick={() => { setSelectedTask(task._id!); setOpen(true) }}
-										/>
-									)
-								})}
-							</List>
+							<>
+								<List>
+									{listNotDone.map((task) => {
+										return (
+											<SysTaskCard
+												key={task._id}
+												task={task}
+												onClick={() => { setSelectedTask(task._id!); setOpen(true) }}
+											/>
+										)
+									})}
+								</List>
+								<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+									<Pagination
+										count={totalPages!.notDone}
+										page={page!.notDone}
+										onChange={(_, i: number) => setPage!({ notDone: i, done: page!.done })}
+									/>
+								</Box>
+							</>
 						}
 
 						<TaskStatus container={true}>
 							<IconButton onClick={() => setShowDone((prev) => !prev)}>
 								{showDone ? <SysIcon name={'expandMore'} /> : <SysIcon name={'chevronRight'} />}
 							</IconButton>
-							<Typography variant='h3'>{`Concluídas (${listDone.length})`}</Typography>
+							<Typography variant='h3'>{`Concluídas (${doneCount})`}</Typography>
 						</TaskStatus>
 
 						{showDone &&
-							<List>
-								{listDone.map((task) => {
-									return (
-										<SysTaskCard
-											key={task._id}
-											task={task}
-											onClick={() => { setSelectedTask(task._id!); setOpen(true) }}
-										/>
-									)
-								})}
-							</List>
+							<>
+								<List>
+									{listDone.map((task) => {
+										return (
+											<SysTaskCard
+												key={task._id}
+												task={task}
+												onClick={() => { setSelectedTask(task._id!); setOpen(true) }}
+											/>
+										)
+									})}
+								</List>
+								<Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+									<Pagination
+										count={totalPages!.done}
+										page={page!.done}
+										onChange={(_, i: number) => setPage!({ done: i, notDone: page!.notDone })}
+									/>
+								</Box>
+							</>
 						}
 					</Box>
 				)}
@@ -169,12 +184,8 @@ const ToDoListView = () => {
 			{open && (
 				<Box
 					sx={{
-						backgroundColor: '#fff',
 						boxShadow: 4,
 						position: 'relative',
-						transition: 'all 500ms ease',
-						transform: open ? 'translateX(0)' : 'translateX(100%)',
-						zIndex: 2
 					}}
 				>
 					<ToDoDetailController close={() => setOpen(false)} id={selectedTask} mode="view" />
@@ -183,6 +194,6 @@ const ToDoListView = () => {
 			)}
 		</Box>
 	);
-};
+});
 
 export default ToDoListView;

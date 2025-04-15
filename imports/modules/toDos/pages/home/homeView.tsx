@@ -58,10 +58,11 @@ const HomeView: React.FC = () => {
 
 			<SysFab
 				sx={{
+					position: 'absolute',
+					bottom: '56px',
 					left: '50%',
 					transform: 'translateX(-50%)'
 				}}
-				fixed
 				text='Ir para tarefas'
 				onClick={() => navigate('/todo')}
 				endIcon={<KeyboardDoubleArrowRightOutlined />}

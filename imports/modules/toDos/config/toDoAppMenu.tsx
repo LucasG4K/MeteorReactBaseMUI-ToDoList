@@ -9,12 +9,7 @@ export const toDoMenuItemList: (IAppMenu | null)[] = [
 		icon: <SysIcon name={'home'} />
 	},
 	{
-		path: '/todo/personal',
-		name: 'ToDo',
-		icon: <SysIcon name={'task'} />
-	},
-	{
-		path: '/todo/group',
+		path: `/todo`,
 		name: 'ToDo',
 		icon: <SysIcon name={'task'} />
 	},

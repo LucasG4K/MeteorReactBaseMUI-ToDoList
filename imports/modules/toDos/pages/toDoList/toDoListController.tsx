@@ -7,7 +7,6 @@ import { toDoApi } from '../../api/toDoApi';
 import AppLayoutContext, { IAppLayoutContext } from '/imports/app/appLayoutProvider/appLayoutContext';
 import ToDoDetailController from '../toDoDetail/toDoDetailController';
 import { sysSizing } from '/imports/ui/materialui/styles';
-import AuthContext, { IAuthContext } from '/imports/app/authProvider/authContext';
 import ToDoListView from './toDoListView';
 import { ToDoModuleContext } from '../../toDoContainer';
 
@@ -23,7 +22,10 @@ interface IToDoListContollerContext {
 	onEditButtonClick?: (id: string) => void;
 	onCheckButtonClick?: (task: IToDo) => void;
 	onDeleteButtonClick?: (task: IToDo) => void;
-	todoList: IToDo[];
+	page?: { notDone: number; done: number };
+	totalPages?: { notDone: number; done: number };
+	setPage?: React.Dispatch<React.SetStateAction<{ notDone: number; done: number }>>;
+	todoList: IToDoListData;
 	schema: ISchema<any>;
 	loading: boolean;
 	onChangeTextField: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -46,7 +48,6 @@ const ToDoListController = () => {
 	const { showDialog } = useContext<IAppLayoutContext>(AppLayoutContext);
 	const { pathname, onEditButtonClick, onCheckButtonClick, onDeleteButtonClick } = useContext(ToDoModuleContext);
 
-
 	const { title, date, done, shared, picture } = toDoApi.getSchema();
 	const toDoSchReduzido = {
 		title,
@@ -63,34 +64,65 @@ const ToDoListController = () => {
 		[sortProperties.field]: sortProperties.sortAscending ? 1 : -1
 	}
 
-	const { loading, todoList } = useTracker(() => {
+	const [page, setPage] = useState({ notDone: 1, done: 1 }); // [0]: Not Done - [1]: Done
+	const limit = 4;
+
+	const { todoList } = useTracker(() => {
 
 		const subHandle = toDoApi.subscribe('toDoList', filter);
 
-		let todoList: Array<IToDo> = [];
-
-		if (!subHandle?.ready()) return {
-			loading: true,
-			todoList,
+		if (!subHandle?.ready()) {
+			return {
+				todoList: {
+					loading: true,
+					listDone: [],
+					listNotDone: [],
+					notDoneCount: 0,
+					doneCount: 0,
+				},
+			};
 		}
 
-		if (pathname === '/todo/personal') {
-			todoList = toDoApi.find(
-				{ ...filter, shared: 'Minhas Tarefas' },
-				{ sort }
-			).fetch();
-		} else {
-			todoList = toDoApi.find(
-				{ ...filter, shared: 'Tarefas do Time' },
-				{ sort }
-			).fetch();
-		}
+		const sharedFilter = pathname === '/todo' ? 'Minhas Tarefas' : 'Tarefas do Time';
+		const baseQuery = { ...filter, shared: sharedFilter };
+
+		const listNotDone = toDoApi.find(
+			{ ...baseQuery, done: { $ne: true } },
+			{
+				sort,
+				skip: (page.notDone - 1) * limit,
+				limit,
+			}
+		).fetch();
+
+		const listDone = toDoApi.find(
+			{ ...baseQuery, done: true },
+			{
+				sort,
+				skip: (page.done - 1) * limit,
+				limit,
+			}
+		).fetch();
+
+		const doneCount = toDoApi.find({ ...baseQuery, done: true }).count();
+		const notDoneCount = toDoApi.find({ ...baseQuery, done: { $ne: true } }).count();
 
 		return {
-			todoList,
-			loading: false,
+			todoList: {
+				loading: false,
+				listDone,
+				listNotDone,
+				doneCount,
+				notDoneCount,
+			},
 		};
-	}, [config, pathname]);
+	}, [config, pathname, page]);
+
+	// [0]: Not Done - [1]: Done
+	const totalPages = {
+		notDone: Math.ceil(todoList.notDoneCount / limit),
+		done: Math.ceil(todoList.doneCount / limit),
+	}
 
 	const onAddButtonClick = useCallback(() => {
 		showDialog({
@@ -116,13 +148,16 @@ const ToDoListController = () => {
 			onEditButtonClick,
 			onCheckButtonClick,
 			onDeleteButtonClick,
+			page,
+			totalPages,
+			setPage,
 			todoList,
 			schema: toDoSchReduzido,
-			loading,
+			loading: todoList.loading,
 			onChangeTextField,
 			pathname,
 		}),
-		[todoList, loading]
+		[todoList]
 	);
 
 	return (
@@ -133,3 +168,11 @@ const ToDoListController = () => {
 };
 
 export default ToDoListController;
+
+interface IToDoListData {
+	loading: boolean;
+	listDone: IToDo[];
+	listNotDone: IToDo[];
+	doneCount: number;
+	notDoneCount: number;
+}
