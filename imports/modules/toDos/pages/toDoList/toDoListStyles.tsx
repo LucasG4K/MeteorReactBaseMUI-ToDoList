@@ -20,8 +20,8 @@ const ToDoListStyles: IToDoListStyles = {
 		flexDirection: 'column',
 		justifyContent: 'flex-start',
 		alignItems: 'flex-start',
-		width: '100%',
-		// height: '100vh',
+		width: '100vw',
+		height: '100%',
 		overflow: 'auto',
 		gap: sysSizing.spacingFixedMd,
 		marginBottom: sysSizing.contentFabDistance

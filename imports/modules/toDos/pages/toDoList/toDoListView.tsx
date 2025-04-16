@@ -69,9 +69,8 @@ const ToDoListView: React.FC = React.memo(() => {
 
 	return (
 
-		<Box sx={{ width: '100%', height: '92vh', display: 'flex', overflow: 'auto' }}>
+		<Box sx={{ width: '100%', height: '92vh', display: 'flex' }}>
 			<Container>
-
 				<TabView>
 					<SysTabs
 						abas={tabs}
@@ -170,10 +169,10 @@ const ToDoListView: React.FC = React.memo(() => {
 
 				<SysFab
 					sx={{
-						position: 'absolute',
+						position: open ? 'fixed' : 'absolute',
 						bottom: '56px',
-						left: '50%',
-						transform: 'translateX(-50%)'
+						left: open ? '30%' : '50%',
+						transform: 'translateX(-50%)',
 					}}
 					variant="extended"
 					text="Adicionar Tarefa"

@@ -65,7 +65,9 @@ const ToDoDetailView: React.FC = React.memo(() => {
 						<IconButton>
 							<SysTaskMoreOptions
 								task={document}
-								deleteDisabled={document.createdby !== user?._id} />
+								onDelete={handleCloseDrawer}
+								deleteDisabled={document.createdby !== user?._id}
+							/>
 						</IconButton>
 						<IconButton onClick={handleCloseDrawer}><SysIcon name='close' /></IconButton>
 					</Grid>

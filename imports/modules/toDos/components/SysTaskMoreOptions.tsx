@@ -13,9 +13,10 @@ import { IToDoModuleContext, ToDoModuleContext } from '../toDoContainer';
 interface ISysTaskMoreOptions {
     task: IToDo;
     deleteDisabled: boolean;
+    onDelete?: () => void | undefined;
 }
 
-const SysTaskMoreOptions: React.FC<ISysTaskMoreOptions> = ({ task, deleteDisabled }) => {
+const SysTaskMoreOptions: React.FC<ISysTaskMoreOptions> = ({ task, deleteDisabled, onDelete }) => {
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -58,6 +59,7 @@ const SysTaskMoreOptions: React.FC<ISysTaskMoreOptions> = ({ task, deleteDisable
                             title: `Excluir tarefa ${task.title}`,
                             message: `Tem certeza que deseja excluir a tarefa ${task.title}?`,
                             onDeleteConfirm: () => {
+                                onDelete!();
                                 onDeleteButtonClick!(task);
                                 sysLayoutContext.showNotification({
                                     message: 'Excluído com sucesso!'
